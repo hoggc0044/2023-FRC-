@@ -1,5 +1,6 @@
 # import libraries
 import pandas
+import math
 
 
 # Functions start here
@@ -82,7 +83,11 @@ def get_expenses(var_fixed):
         item_name = not_blank("Item name: ",
                               "The component name can't be blank.")
 
-        if item_name.lower() == "xxx":
+        if item_name.lower() == "xxx" and var_fixed == "variable" and len(item_list) < 1:
+            item_name = ""
+            print("you must have at least one variable cost")
+            continue
+        elif item_name.lower() == "xxx":
             break
 
         if var_fixed == "variable":
@@ -168,6 +173,7 @@ def profit_goal(total_costs):
             dollar_type = yes_no("Do you mean ${:.2f}. "
                                  "ie {:.2f} dollars?, y/n "
                                  "".format(amount, amount))
+            dollar_type = yes_no(f"Do you mean {amount:.2f}")
 
             # SET PROFIT TYPE BASED ON USER ANSWER ABOVE
             if dollar_type == "yes":
@@ -190,14 +196,20 @@ def profit_goal(total_costs):
             return goal
 
 
-# **** Main routine begins ****
+# rounding function
+def round_up(amount, round_to):
+    return int(math.ceil(amount / round_to)) * round_to
 
+
+# **** Main routine begins ****
 # Get product name
 product_name = not_blank("Product name: ", "The product name can't be blank.")
 
+how_many = num_check("How many items will you be producing?",
+                     "The number of items must be a whole number more than zero", int)
+
 print()
 print("Please enter your variable costs:")
-print()
 # Get variable costs
 variable_expenses = get_expenses("variable")
 variable_frame = variable_expenses[0]
@@ -217,7 +229,20 @@ else:
 all_costs = variable_sub + fixed_sub
 profit_target = profit_goal(all_costs)
 
-selling_price = 0
+# Calculates total sales needed to reach goal
+sales_needed = all_costs + profit_target
+
+# Ask user for rounding
+round_to = num_check("Round to nearest...?",
+                     "Can't be 0", int)
+
+# Calculate recommended price
+selling_price = sales_needed / how_many
+print(f"Selling Price (unrounded): ${selling_price:.2f}")
+
+recommended_price = round_up(selling_price, round_to)
+
+# Write to File
 
 # **** Printing Area ****
 print()
@@ -228,6 +253,6 @@ expense_print("Variable", variable_frame, variable_sub)
 if have_fixed == "yes":
     expense_print("Fixed", fixed_frame[['Cost']], fixed_sub)
 print()
-print("**** Total Costs: ${:.2f} ****")
+print(f"**** Total Costs: ${sales_needed:.2f} ****")
 print()
 
