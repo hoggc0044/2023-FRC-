@@ -25,7 +25,7 @@ profit_target = "$100.00"
 required_sales = "$200.00"
 recommended_price = "The recommended price is $5.00"
 
-# list holdong stuff to print / write to file
+# list holding stuff to print / write to file
 to_write = [product_name, variable_txt, fixed_txt,
             profit_target, required_sales,
             recommended_price]
